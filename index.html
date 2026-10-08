@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Земля Логики. Тайна разбитой форточки — Мягкая математика</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0a0e1a; --card: #1a2233; --text: #e8edf7; --text-dim: #8892a8;
+  --cyan: #00d4ff; --purple: #a855f7; --pink: #ec4899; --mint: #10b981;
+  --gold: #fbbf24; --coral: #ef4444;
+}
+html, body { font-family: -apple-system, 'Arial', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(0, 212, 255, 0.15) 0%, transparent 40%), radial-gradient(circle at 80% 90%, rgba(168, 85, 247, 0.12) 0%, transparent 40%); pointer-events: none; z-index: 0; }
+body::after { content: ""; position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+.container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 14px; }
+.screen { display: none; animation: fadeIn 0.5s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(26, 34, 51, 0.9); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 16px; padding: 10px 14px; margin-bottom: 14px; backdrop-filter: blur(12px); flex-wrap: wrap; gap: 8px; }
+.top-stats { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.stat-item { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 800; color: var(--text-dim); }
+.stat-item .stat-value { color: var(--gold); }
+.stat-item .stat-icon { font-size: 16px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--cyan), #0099cc); color: #001a22; padding: 14px 28px; border-radius: 60px; font-size: 15px; font-weight: 900; border: none; cursor: pointer; box-shadow: 0 6px 0 #006680, 0 8px 20px rgba(0, 212, 255, 0.4); transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: inherit; min-height: 48px; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #006680, 0 12px 28px rgba(0, 212, 255, 0.6); }
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #006680; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: #1a0f00; box-shadow: 0 6px 0 #92400e, 0 8px 20px rgba(251, 191, 36, 0.4); }
+.btn-gold:hover { box-shadow: 0 8px 0 #92400e, 0 12px 28px rgba(251, 191, 36, 0.6); }
+.btn-gold:active { box-shadow: 0 2px 0 #92400e; }
+.btn-secondary { background: transparent; color: var(--cyan); border: 2px solid var(--cyan); box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+.btn-secondary:hover { background: rgba(0, 212, 255, 0.1); box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
+.btn-small { padding: 10px 18px; font-size: 12px; min-height: 40px; }
+
+.start-screen { text-align: center; padding: 30px 16px; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.start-icon { font-size: 100px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.6)); }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
+.start-title { font-size: clamp(28px, 7vw, 52px); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink)); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; animation: gradientShift 4s ease infinite; }
+@keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.start-sub { font-size: clamp(13px, 3vw, 18px); color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+.start-dialogue { max-width: 620px; background: rgba(26, 34, 51, 0.95); border: 1px solid rgba(0, 212, 255, 0.4); border-radius: 20px; padding: 22px; margin-bottom: 24px; text-align: left; position: relative; backdrop-filter: blur(12px); }
+.start-dialogue::before { content: "🦉 ЛОГИК"; position: absolute; top: -12px; left: 20px; background: var(--cyan); color: #001a22; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 900; letter-spacing: 2px; }
+.start-dialogue p { font-size: clamp(13px, 2.5vw, 15px); line-height: 1.8; margin-bottom: 10px; }
+.start-dialogue p:last-child { margin-bottom: 0; }
+.start-dialogue strong { color: var(--cyan); }
+.start-dialogue em { color: var(--gold); font-style: normal; }
+
+.game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+.game-header h2 { font-size: clamp(16px, 3.5vw, 22px); font-weight: 900; color: var(--cyan); text-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+.game-scene { text-align: center; margin-bottom: 16px; padding: 14px 18px; background: rgba(0, 212, 255, 0.1); border-radius: 16px; border-left: 4px solid var(--cyan); font-size: 14px; font-style: italic; line-height: 1.6; }
+.game-scene strong { color: var(--gold); font-style: normal; }
+
+.bloom-progress { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.bloom-step { flex: 1; min-width: 60px; padding: 6px 8px; background: rgba(26, 34, 51, 0.7); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 8px; text-align: center; font-size: 9px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; }
+.bloom-step.active { background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; border-color: transparent; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); transform: scale(1.05); }
+.bloom-step.done { background: rgba(16, 185, 129, 0.2); color: var(--mint); border-color: var(--mint); }
+
+.game-card { background: rgba(26, 34, 51, 0.95); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 22px; padding: 22px; backdrop-filter: blur(12px); margin-bottom: 14px; }
+.question { text-align: center; margin-bottom: 20px; padding: 16px; background: rgba(10, 14, 26, 0.6); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 16px; }
+.question-label { font-size: 10px; color: var(--cyan); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.question-text { font-size: clamp(15px, 3vw, 19px); font-weight: 800; line-height: 1.5; }
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option { padding: 14px 18px; background: rgba(10, 14, 26, 0.8); border: 2px solid rgba(0, 212, 255, 0.4); border-radius: 14px; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.2s ease; text-align: left; font-family: inherit; min-height: 48px; display: flex; align-items: center; gap: 10px; }
+.option:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0, 212, 255, 0.1); transform: translateX(5px); }
+.option:disabled { cursor: not-allowed; }
+.option.correct { border-color: var(--mint); background: rgba(16, 185, 129, 0.2); color: var(--mint); animation: pop 0.4s ease; }
+.option.wrong { border-color: var(--coral); background: rgba(239, 68, 68, 0.2); color: #fca5a5; animation: shake 0.4s ease; }
+.option .opt-letter { width: 28px; height: 28px; border-radius: 50%; background: rgba(0, 212, 255, 0.5); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 900; color: #001a22; }
+
+.feedback { padding: 14px 18px; border-radius: 14px; margin-top: 14px; font-size: 14px; font-weight: 700; line-height: 1.6; display: none; }
+.feedback.show { display: block; animation: slideUp 0.4s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.feedback.correct { background: rgba(16, 185, 129, 0.15); border-left: 4px solid var(--mint); color: var(--mint); }
+.feedback.wrong { background: rgba(239, 68, 68, 0.15); border-left: 4px solid var(--coral); color: #fca5a5; }
+.feedback .explain { margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--text); opacity: 0.9; }
+
+/* СОСУДЫ */
+.vessels { display: flex; justify-content: center; gap: 30px; margin: 20px 0; flex-wrap: wrap; }
+.vessel-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.vessel { width: 80px; height: 130px; border: 3px solid var(--cyan); border-top: none; border-radius: 0 0 12px 12px; position: relative; background: rgba(0, 212, 255, 0.05); overflow: hidden; box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.2), 0 0 20px rgba(0, 212, 255, 0.3); }
+.vessel .water { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, var(--cyan), #006680); transition: height 0.4s ease; box-shadow: 0 0 15px rgba(0, 212, 255, 0.6); }
+.vessel .water::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: rgba(255, 255, 255, 0.5); }
+.vessel-label { font-size: 12px; font-weight: 900; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; }
+.vessel-value { font-size: 18px; font-weight: 900; color: var(--gold); }
+
+.vessel-controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+.vessel-btn { background: rgba(26, 34, 51, 0.9); border: 2px solid rgba(0, 212, 255, 0.4); color: var(--text); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
+.vessel-btn:hover:not(:disabled) { background: rgba(0, 212, 255, 0.15); border-color: var(--cyan); transform: translateY(-2px); }
+.vessel-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* КРУГИ ЭЙЛЕРА */
+.euler-wrap { display: flex; justify-content: center; margin: 20px 0; }
+.euler-svg { max-width: 100%; height: auto; }
+.euler-circle { fill: rgba(0, 212, 255, 0.15); stroke: var(--cyan); stroke-width: 2; }
+.euler-circle-2 { fill: rgba(168, 85, 247, 0.15); stroke: var(--purple); stroke-width: 2; }
+.euler-text { fill: var(--text); font-weight: 900; font-size: 16px; text-anchor: middle; dominant-baseline: middle; }
+.euler-label { fill: var(--text-dim); font-weight: 800; font-size: 12px; text-anchor: middle; }
+
+/* ДЕТЕКТИВНЫЕ КАРТОЧКИ */
+.detectives { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+.detective-card { background: rgba(10, 14, 26, 0.8); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 14px; padding: 14px; text-align: center; }
+.detective-card .avatar { font-size: 40px; margin-bottom: 6px; }
+.detective-card .name { font-size: 14px; font-weight: 900; color: var(--gold); margin-bottom: 6px; }
+.detective-card .quote { font-size: 12px; font-style: italic; color: var(--text-dim); line-height: 1.4; }
+
+@media (max-width: 600px) {
+  .container { padding: 10px; }
+  .btn { padding: 12px 20px; font-size: 13px; }
+  .detectives { grid-template-columns: 1fr; }
+  .vessel { width: 60px; height: 100px; }
+}
+
+/* ЧАСТИЦЫ */
+.particles { position: fixed; pointer-events: none; z-index: 9999; }
+.particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; animation: particleFly 0.8s ease-out forwards; }
+@keyframes particleFly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+.screen-shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes shake { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-4px, 0); } 40% { transform: translate(4px, -4px); } 60% { transform: translate(-4px, 4px); } 80% { transform: translate(4px, 0); } }
+@keyframes pop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+.result-screen { text-align: center; padding: 30px 16px; }
+.result-icon { font-size: clamp(80px, 18vw, 130px); margin-bottom: 16px; animation: float 2s ease-in-out infinite; filter: drop-shadow(0 0 50px rgba(251, 191, 36, 0.8)); }
+.result-title { font-size: clamp(24px, 6vw, 40px); font-weight: 900; background: linear-gradient(135deg, var(--gold), var(--pink), var(--cyan)); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; animation: gradientShift 3s ease infinite; }
+.result-sub { font-size: clamp(14px, 3vw, 17px); color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; }
+.result-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.result-stat { background: rgba(26, 34, 51, 0.9); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 14px; padding: 14px; }
+.result-stat .value { font-size: 24px; font-weight: 900; color: var(--gold); margin-bottom: 4px; }
+.result-stat .label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+.reflection { background: rgba(26, 34, 51, 0.9); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 20px; padding: 20px; margin: 20px 0; text-align: left; }
+.reflection h3 { color: var(--cyan); font-size: 17px; margin-bottom: 14px; text-align: center; }
+.reflection-item { margin-bottom: 14px; }
+.reflection-item label { display: block; font-size: 13px; font-weight: 800; color: var(--text-dim); margin-bottom: 6px; }
+.reflection-item textarea { width: 100%; padding: 12px 14px; background: rgba(10, 14, 26, 0.7); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; font-size: 14px; font-family: inherit; color: var(--text); resize: vertical; min-height: 60px; }
+.reflection-item textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1); }
+.ad-block { background: rgba(26, 34, 51, 0.9); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 16px; padding: 16px 18px; margin-top: 16px; text-align: center; font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.ad-block strong { color: var(--cyan); display: block; margin-bottom: 6px; font-size: 14px; }
+.ad-block a { color: var(--gold); font-weight: 800; text-decoration: none; display: inline-block; margin: 4px 8px; }
+.ad-block a:hover { text-decoration: underline; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="top-stats">
+      <div class="stat-item"><span class="stat-icon">🏆</span><span class="stat-value" id="coins">0</span></div>
+      <div class="stat-item"><span class="stat-icon">🎯</span><span class="stat-value" id="attempts">0</span></div>
+      <div class="stat-item"><span class="stat-icon">💡</span><span class="stat-value" id="level">Знание</span></div>
+    </div>
+  </div>
+
+  <!-- СТАРТ -->
+  <div id="screen-start" class="screen active">
+    <div class="start-screen">
+      <div class="start-icon">🦉</div>
+      <div class="start-title">Тайна разбитой форточки</div>
+      <div class="start-sub">Земля Логики</div>
+
+      <div class="start-dialogue">
+        <p><strong>Логик:</strong> Внимание, юный детектив!</p>
+        <p>В нашей школе кто-то разбил форточку. Три свидетеля дают показания, но <em>один из них лжёт</em>.</p>
+        <p>Чтобы распутать это дело, тебе понадобится <strong>логика</strong>. Готов?</p>
+      </div>
+
+      <button type="button" class="btn btn-gold" onclick="startGame()">🔍 Начать расследование</button>
+    </div>
+  </div>
+
+  <!-- ИГРА -->
+  <div id="screen-game" class="screen">
+    <div class="game-header">
+      <h2>🦉 Дело о форточке</h2>
+      <button type="button" class="btn btn-secondary btn-small" onclick="resetGame()">↺ Сбросить</button>
+    </div>
+
+    <div class="bloom-progress" id="bloom-progress">
+      <div class="bloom-step active" data-step="0">Знание</div>
+      <div class="bloom-step" data-step="1">Понимание</div>
+      <div class="bloom-step" data-step="2">Применение</div>
+      <div class="bloom-step" data-step="3">Анализ</div>
+      <div class="bloom-step" data-step="4">Синтез</div>
+      <div class="bloom-step" data-step="5">Оценка</div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-scene" id="game-scene">
+        <strong>Логик:</strong> «Начнём с основ. Что такое логическая задача?»
+      </div>
+
+      <div class="question">
+        <div class="question-label" id="question-label">Уровень: Знание</div>
+        <div class="question-text" id="question-text">Что такое логическая задача?</div>
+      </div>
+
+      <div id="content-container"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="controls" id="next-container" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ФИНАЛ -->
+  <div id="screen-final" class="screen">
+    <div class="result-screen">
+      <div class="result-icon">🕵️</div>
+      <div class="result-title">Дело закрыто!</div>
+      <div class="result-sub">
+        Ты раскрыл тайну разбитой форточки и освоил<br>
+        <strong>методы логических рассуждений</strong>: перебор гипотез,<br>
+        круги Эйлера, принцип Дирихле и анализ высказываний.
+      </div>
+
+      <div class="result-stats">
+        <div class="result-stat"><div class="value" id="final-coins">0</div><div class="label">Монет</div></div>
+        <div class="result-stat"><div class="value" id="final-attempts">0</div><div class="label">Попыток</div></div>
+        <div class="result-stat"><div class="value" id="final-bloom">6/6</div><div class="label">Уровней Блума</div></div>
+      </div>
+
+      <div class="reflection">
+        <h3>💭 Рефлексия</h3>
+        <div class="reflection-item"><label>Какой метод рассуждения помог тебе больше всего?</label><textarea id="reflect-1" placeholder="Напиши здесь..."></textarea></div>
+        <div class="reflection-item"><label>Что было самым сложным?</label><textarea id="reflect-2" placeholder="Напиши здесь..."></textarea></div>
+        <div class="reflection-item"><label>Где в жизни пригодится умение рассуждать логически?</label><textarea id="reflect-3" placeholder="Напиши здесь..."></textarea></div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="btn btn-gold" onclick="restartAll()">🔄 Ещё раз</button>
+      </div>
+    </div>
+
+    <div class="ad-block">
+      <strong>🎓 Мягкая математика</strong>
+      Хочешь ещё больше логических задач? Приходи на курс!
+      <br>
+      <a href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">📢 Группа ВК</a>
+      <a href="https://vk.com/im/convo/-229273902" target="_blank" rel="noopener">✉️ Мария Абрамова</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// СОСТОЯНИЕ
+// ============================================================
+const state = {
+  coins: 0,
+  attempts: 0,
+  bloomStep: 0,
+  vesselsSolved: false,
+  detectiveSolved: false
+};
+
+const BLOOM_LEVELS = ['Знание', 'Понимание', 'Применение', 'Анализ', 'Синтез', 'Оценка'];
+
+// ============================================================
+// GAME FEEL
+// ============================================================
+function spawnParticles(x, y, color, count = 12) {
+  const container = document.createElement('div');
+  container.className = 'particles';
+  container.style.left = x + 'px';
+  container.style.top = y + 'px';
+  document.body.appendChild(container);
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.background = color;
+    p.style.boxShadow = `0 0 10px ${color}`;
+    const angle = (Math.PI * 2 * i) / count;
+    const dist = 60 + Math.random() * 60;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    container.appendChild(p);
+  }
+  setTimeout(() => container.remove(), 1000);
+}
+function screenShake() {
+  document.body.classList.add('screen-shake');
+  setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+}
+
+// ============================================================
+// СТАРТ / СБРОС
+// ============================================================
+function startGame() {
+  document.getElementById('screen-start').classList.remove('active');
+  document.getElementById('screen-game').classList.add('active');
+  state.bloomStep = 0;
+  state.coins = 0;
+  state.attempts = 0;
+  state.vesselsSolved = false;
+  state.detectiveSolved = false;
+  updateTopBar();
+  renderBloomStep();
+}
+function resetGame() {
+  if (!confirm('Сбросить прогресс и вернуться в начало?')) return;
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-final').classList.remove('active');
+  document.getElementById('screen-start').classList.add('active');
+}
+function restartAll() {
+  document.getElementById('screen-final').classList.remove('active');
+  document.getElementById('screen-start').classList.add('active');
+}
+function updateTopBar() {
+  document.getElementById('coins').textContent = state.coins;
+  document.getElementById('attempts').textContent = state.attempts;
+  document.getElementById('level').textContent = BLOOM_LEVELS[state.bloomStep];
+}
+
+// ============================================================
+// РЕНДЕР УРОВНЯ
+// ============================================================
+function renderBloomStep() {
+  document.querySelectorAll('.bloom-step').forEach((el, i) => {
+    el.classList.remove('active', 'done');
+    if (i < state.bloomStep) el.classList.add('done');
+    if (i === state.bloomStep) el.classList.add('active');
+  });
+  document.getElementById('question-label').textContent = 'Уровень: ' + BLOOM_LEVELS[state.bloomStep];
+  updateTopBar();
+  document.getElementById('content-container').innerHTML = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').innerHTML = '';
+  document.getElementById('next-container').style.display = 'none';
+  document.getElementById('next-container').innerHTML = 
+    '<button type="button" class="btn btn-gold" onclick="nextBloomStep()">Следующий уровень →</button>';
+
+  if (state.bloomStep === 0) renderZnanie();
+  else if (state.bloomStep === 1) renderPonimanie();
+  else if (state.bloomStep === 2) renderPrimenenie();
+  else if (state.bloomStep === 3) renderAnaliz();
+  else if (state.bloomStep === 4) renderSintez();
+  else if (state.bloomStep === 5) renderOcenka();
+}
+
+// ============================================================
+// УРОВЕНЬ 1. ЗНАНИЕ
+// ============================================================
+function renderZnanie() {
+  document.getElementById('question-text').textContent = 'Что такое логическая задача?';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Прежде чем распутывать дела, надо понять, с чем работаем.»';
+
+  const options = [
+    { text: 'Задача, где нужно рассуждать и делать выводы', correct: true },
+    { text: 'Задача, где нужно быстро считать', correct: false },
+    { text: 'Задача, где нужно запоминать числа', correct: false },
+    { text: 'Задача, где нужно рисовать', correct: false }
+  ];
+
+  renderOptions(options, (opt, btn) => {
+    state.attempts++;
+    if (opt.correct) {
+      btn.classList.add('correct');
+      state.coins += 5;
+      showFeedback(true, '✅ Верно!', 
+        'Логическая задача — это задача, где важно не просто вычислить, а рассуждать: проверять гипотезы, искать противоречия, делать выводы.');
+      spawnParticles(btn.getBoundingClientRect().left + 100, btn.getBoundingClientRect().top + 20, '#10b981', 16);
+      document.getElementById('next-container').style.display = 'flex';
+    } else {
+      btn.classList.add('wrong');
+      showFeedback(false, 'Не совсем.', 'Подумай: что отличает логику от простого счёта?');
+      screenShake();
+    }
+    updateTopBar();
+  });
+}
+
+// ============================================================
+// УРОВЕНЬ 2. ПОНИМАНИЕ — Задача с подвохом
+// ============================================================
+function renderPonimanie() {
+  document.getElementById('question-text').textContent = 'В комнате 4 угла. В каждом углу сидит кошка. Напротив каждой кошки — 3 кошки. Сколько кошек в комнате?';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Разминка на внимательность. Читай условие медленно!»';
+
+  const options = [
+    { text: '4 кошки', correct: true },
+    { text: '12 кошек', correct: false },
+    { text: '16 кошек', correct: false },
+    { text: '3 кошки', correct: false }
+  ];
+
+  renderOptions(options, (opt, btn) => {
+    state.attempts++;
+    if (opt.correct) {
+      btn.classList.add('correct');
+      state.coins += 5;
+      showFeedback(true, '✅ Верно!', 
+        'В комнате 4 кошки — по одной в каждом углу. Каждая кошка видит трёх других (в остальных углах). Никого больше нет. Задача на внимательность!');
+      spawnParticles(btn.getBoundingClientRect().left + 100, btn.getBoundingClientRect().top + 20, '#10b981', 16);
+      document.getElementById('next-container').style.display = 'flex';
+    } else {
+      btn.classList.add('wrong');
+      showFeedback(false, 'Не спеши.', 'Перечитай: кошка в углу видит ТРЁХ ДРУГИХ кошек. Она сама не считается.');
+      screenShake();
+    }
+    updateTopBar();
+  });
+}
+
+// ============================================================
+// УРОВЕНЬ 3. ПРИМЕНЕНИЕ — Переливание
+// ============================================================
+let vesselState = { fiveL: 0, threeL: 0 };
+
+function renderPrimenenie() {
+  vesselState = { fiveL: 0, threeL: 0 };
+  document.getElementById('question-text').textContent = 'Набери ровно 4 литра, используя сосуды 5 л и 3 л';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Есть кран с водой, сосуд 5 л и сосуд 3 л. Как получить 4 л?»';
+
+  const container = document.getElementById('content-container');
+  container.innerHTML = `
+    <div class="vessels">
+      <div class="vessel-wrap">
+        <div class="vessel"><div class="water" id="water5" style="height:0%"></div></div>
+        <div class="vessel-label">5 литров</div>
+        <div class="vessel-value" id="val5">0 л</div>
+      </div>
+      <div class="vessel-wrap">
+        <div class="vessel"><div class="water" id="water3" style="height:0%"></div></div>
+        <div class="vessel-label">3 литра</div>
+        <div class="vessel-value" id="val3">0 л</div>
+      </div>
+    </div>
+    <div class="vessel-controls">
+      <button type="button" class="vessel-btn" onclick="fillVessel(5)">🚰 Наполнить 5 л</button>
+      <button type="button" class="vessel-btn" onclick="fillVessel(3)">🚰 Наполнить 3 л</button>
+      <button type="button" class="vessel-btn" onclick="pourVessel(5, 3)">↘ Перелить 5 → 3</button>
+      <button type="button" class="vessel-btn" onclick="pourVessel(3, 5)">↘ Перелить 3 → 5</button>
+      <button type="button" class="vessel-btn" onclick="emptyVessel(5)">🗑 Вылить 5 л</button>
+      <button type="button" class="vessel-btn" onclick="emptyVessel(3)">🗑 Вылить 3 л</button>
+    </div>
+    <div class="controls">
+      <button type="button" class="btn btn-secondary btn-small" onclick="renderPrimenenie()">↺ Сбросить</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  `;
+  updateVessels();
+}
+
+function updateVessels() {
+  document.getElementById('val5').textContent = vesselState.fiveL + ' л';
+  document.getElementById('val3').textContent = vesselState.threeL + ' л';
+  document.getElementById('water5').style.height = (vesselState.fiveL / 5 * 100) + '%';
+  document.getElementById('water3').style.height = (vesselState.threeL / 3 * 100) + '%';
+}
+
+function fillVessel(cap) {
+  if (cap === 5) vesselState.fiveL = 5;
+  else vesselState.threeL = 3;
+  updateVessels();
+  checkVesselGoal();
+}
+function emptyVessel(cap) {
+  if (cap === 5) vesselState.fiveL = 0;
+  else vesselState.threeL = 0;
+  updateVessels();
+}
+function pourVessel(from, to) {
+  if (from === 5 && to === 3) {
+    const transfer = Math.min(vesselState.fiveL, 3 - vesselState.threeL);
+    vesselState.fiveL -= transfer;
+    vesselState.threeL += transfer;
+  } else if (from === 3 && to === 5) {
+    const transfer = Math.min(vesselState.threeL, 5 - vesselState.fiveL);
+    vesselState.threeL -= transfer;
+    vesselState.fiveL += transfer;
+  }
+  updateVessels();
+  checkVesselGoal();
+}
+
+function checkVesselGoal() {
+  if (vesselState.fiveL === 4 && !state.vesselsSolved) {
+    state.vesselsSolved = true;
+    state.coins += 10;
+    state.attempts++;
+    showFeedback(true, '🎉 Ты набрал ровно 4 литра!', 
+      'Отличная работа! Ты использовал метод переливания. Теперь ты знаешь: даже с двумя сосудами можно отмерить любое количество.');
+    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#10b981', 40);
+    document.getElementById('next-container').style.display = 'flex';
+    updateTopBar();
+  }
+}
+
+// ============================================================
+// УРОВЕНЬ 4. АНАЛИЗ — Детективная задача
+// ============================================================
+function renderAnaliz() {
+  state.detectiveSolved = false;
+  document.getElementById('question-text').textContent = 'Двое говорят правду, один лжёт. Кто разбил форточку?';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Изучи показания трёх свидетелей и найди виновника.»';
+
+  const container = document.getElementById('content-container');
+  container.innerHTML = `
+    <div class="detectives">
+      <div class="detective-card">
+        <div class="avatar">🧑‍🦰</div>
+        <div class="name">Рыжий</div>
+        <div class="quote">«Это сделал не я»</div>
+      </div>
+      <div class="detective-card">
+        <div class="avatar">👦</div>
+        <div class="name">Вася</div>
+        <div class="quote">«Это сделал Рыжий»</div>
+      </div>
+      <div class="detective-card">
+        <div class="avatar">👨</div>
+        <div class="name">Коля</div>
+        <div class="quote">«Это сделал Вася»</div>
+      </div>
+    </div>
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback"></div>
+  `;
+
+  const options = [
+    { text: 'Рыжий разбил', correct: false, explain: 'Если Рыжий разбил: Рыжий лжёт, Вася прав, Коля лжёт → один правдивый. Не подходит.' },
+    { text: 'Вася разбил', correct: true, explain: 'Если Вася разбил: Рыжий прав, Вася лжёт, Коля прав → двое правдивых. ✅' },
+    { text: 'Коля разбил', correct: false, explain: 'Если Коля разбил: Рыжий прав, Вася лжёт, Коля лжёт → один правдивый. Не подходит.' },
+    { text: 'Никто не разбил', correct: false, explain: 'Форточка разбита — значит, кто-то её разбил.' }
+  ];
+
+  const opts = document.getElementById('options-container');
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${opt.text}</span>`;
+    btn.onclick = () => {
+      state.attempts++;
+      opts.querySelectorAll('.option').forEach(b => b.disabled = true);
+      if (opt.correct) {
+        btn.classList.add('correct');
+        if (!state.detectiveSolved) { state.detectiveSolved = true; state.coins += 10; }
+        showFeedback(true, '✅ Верно! Виноват Вася.', opt.explain);
+        spawnParticles(btn.getBoundingClientRect().left + 100, btn.getBoundingClientRect().top + 20, '#10b981', 20);
+        document.getElementById('next-container').style.display = 'flex';
+      } else {
+        btn.classList.add('wrong');
+        showFeedback(false, 'Не подходит.', opt.explain);
+        screenShake();
+      }
+      updateTopBar();
+    };
+    opts.appendChild(btn);
+  });
+}
+
+// ============================================================
+// УРОВЕНЬ 5. СИНТЕЗ — Круги Эйлера
+// ============================================================
+function renderSintez() {
+  document.getElementById('question-text').textContent = 'В классе 30 учеников. 20 ходят в школьную библиотеку, 15 — в городскую. Сколько не ходят в школьную?';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Представь информацию в виде кругов Эйлера. Так виднее.»';
+
+  const container = document.getElementById('content-container');
+  container.innerHTML = `
+    <div class="euler-wrap">
+      <svg class="euler-svg" width="320" height="200" viewBox="0 0 320 200">
+        <circle class="euler-circle" cx="120" cy="100" r="70"/>
+        <circle class="euler-circle-2" cx="200" cy="100" r="70"/>
+        <text class="euler-text" x="80" y="100">20</text>
+        <text class="euler-text" x="160" y="100" style="fill:var(--gold)">?</text>
+        <text class="euler-text" x="240" y="100">15</text>
+        <text class="euler-label" x="80" y="180">Школьная</text>
+        <text class="euler-label" x="240" y="180">Городская</text>
+      </svg>
+    </div>
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback"></div>
+  `;
+
+  const options = [
+    { text: '10 учеников', correct: true, explain: '20 в школьной, всего 30 → не в школьной = 30 − 20 = 10. (И это логично: 15 + 5 в городской, пересечение 5.)' },
+    { text: '5 учеников', correct: false, explain: 'Это число тех, кто ходит в ОБЕ библиотеки: 20 + 15 − 30 = 5.' },
+    { text: '15 учеников', correct: false, explain: 'Это число тех, кто ходит в городскую библиотеку.' },
+    { text: '20 учеников', correct: false, explain: 'Это число тех, кто ходит в школьную библиотеку.' }
+  ];
+
+  const opts = document.getElementById('options-container');
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${opt.text}</span>`;
+    btn.onclick = () => {
+      state.attempts++;
+      opts.querySelectorAll('.option').forEach(b => b.disabled = true);
+      if (opt.correct) {
+        btn.classList.add('correct');
+        state.coins += 10;
+        showFeedback(true, '✅ Верно! 10 учеников.', opt.explain);
+        spawnParticles(btn.getBoundingClientRect().left + 100, btn.getBoundingClientRect().top + 20, '#10b981', 20);
+        document.getElementById('next-container').style.display = 'flex';
+      } else {
+        btn.classList.add('wrong');
+        showFeedback(false, 'Не то.', opt.explain);
+        screenShake();
+      }
+      updateTopBar();
+    };
+    opts.appendChild(btn);
+  });
+}
+
+// ============================================================
+// УРОВЕНЬ 6. ОЦЕНКА — Принцип Дирихле / выбор метода
+// ============================================================
+function renderOcenka() {
+  document.getElementById('question-text').textContent = 'В классе 13 учеников. Какое рассуждение доказывает, что хотя бы двое родились в один месяц?';
+  document.getElementById('game-scene').innerHTML = 
+    '<strong>Логик:</strong> «Оцени разные способы. Какой из них строгий и правильный?»';
+
+  const options = [
+    { text: 'Перебором всех 13 учеников', correct: false, explain: 'Перебор не даёт доказательства — учеников много, и мы не знаем их даты рождения.' },
+    { text: 'Если бы все родились в разные месяцы, их было бы не больше 12. Но их 13 → противоречие. Значит, хотя бы двое в один месяц.', correct: true, explain: 'Это принцип Дирихле! 13 «кроликов» и 12 «клеток» (месяцев). Обязательно найдётся клетка с двумя кроликами.' },
+    { text: 'Надо спросить у каждого ученика его месяц рождения', correct: false, explain: 'Это тоже вариант, но он нестрогий — нам нужно логическое доказательство, а не опрос.' },
+    { text: 'Вероятность подскажет ответ', correct: false, explain: 'Вероятность здесь не нужна — это точное доказательство, а не оценка шансов.' }
+  ];
+
+  renderOptions(options, (opt, btn) => {
+    state.attempts++;
+    if (opt.correct) {
+      btn.classList.add('correct');
+      state.coins += 10;
+      showFeedback(true, '✅ Отличная оценка метода!', opt.explain);
+      spawnParticles(btn.getBoundingClientRect().left + 100, btn.getBoundingClientRect().top + 20, '#fbbf24', 30);
+      document.getElementById('next-container').style.display = 'flex';
+      document.getElementById('next-container').innerHTML = 
+        '<button type="button" class="btn btn-gold" onclick="showFinal()">🏆 Завершить</button>';
+    } else {
+      btn.classList.add('wrong');
+      showFeedback(false, 'Не самый сильный метод.', opt.explain);
+      screenShake();
+    }
+    updateTopBar();
+  });
+}
+
+// ============================================================
+// ОБЩИЕ
+// ============================================================
+function renderOptions(options, onClick) {
+  const container = document.getElementById('content-container');
+  container.innerHTML = '';
+  const opts = document.createElement('div');
+  opts.className = 'options';
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + i)}</span><span>${opt.text}</span>`;
+    btn.onclick = () => {
+      if (btn.disabled) return;
+      opts.querySelectorAll('.option').forEach(b => b.disabled = true);
+      onClick(opt, btn);
+    };
+    opts.appendChild(btn);
+  });
+  container.appendChild(opts);
+}
+
+function showFeedback(isCorrect, text, explain) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = text + (explain ? `<div class="explain">${explain}</div>` : '');
+}
+
+function nextBloomStep() {
+  state.bloomStep++;
+  if (state.bloomStep >= 6) showFinal();
+  else renderBloomStep();
+}
+
+function showFinal() {
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-final').classList.add('active');
+  document.getElementById('final-coins').textContent = state.coins;
+  document.getElementById('final-attempts').textContent = state.attempts;
+  document.getElementById('final-bloom').textContent = '6/6';
+  spawnParticles(window.innerWidth / 2, window.innerHeight / 2, '#fbbf24', 50);
+}
+
+// ============================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================================
+updateTopBar();
+console.log('%c🦉 Земля Логики загружена!', 'color:#00d4ff;font-size:16px;font-weight:bold');
+console.log('%c📢 Мягкая математика: https://vk.com/smartskillsmaria', 'color:#10b981;font-size:13px');
+</script>
+</body>
+</html>
